@@ -17,6 +17,15 @@ use HTML::Zoom;
   sub slug { shift->{slug} }
   sub name { shift->{name} }
   sub video_count { shift->{video_count} }
+  sub videos { shift->{videos} }
+
+  package App::IdiotBox::Video;
+
+  sub slug { shift->{slug} }
+  sub name { shift->{name} }
+  sub author { shift->{author} }
+  sub details { shift->{details} }
+  sub bucket { shift->{bucket} }
 }
 
 default_config(
