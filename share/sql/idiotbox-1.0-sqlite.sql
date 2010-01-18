@@ -15,6 +15,8 @@ CREATE TABLE videos (
   name TEXT NOT NULL,
   author TEXT NOT NULL,
   details TEXT NOT NULL DEFAULT '',
-  announcement_id INTEGER REFERENCES announcements(id),
-  PRIMARY KEY (slug, bucket_slug)
+  announcement_id INTEGER NOT NULL,
+  PRIMARY KEY (slug, bucket_slug),
+  FOREIGN KEY (announcement_id, bucket_slug)
+    REFERENCES announcements(id, bucket_slug)
 );
