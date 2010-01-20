@@ -9,7 +9,7 @@ INSERT INTO announcements (id, made_at, bucket_slug) VALUES (
   1, '2009-12-25 09:00:00', 'lpw2009'
 );
 INSERT INTO announcements (id, made_at, bucket_slug) VALUES (
-  2, '2010-01-01 14:00:00', 'lpw2009',
+  2, '2010-01-01 14:00:00', 'lpw2009'
 );
 INSERT INTO announcements (id, made_at, bucket_slug) VALUES (
   3, '2010-01-21 01:00:00', 'opw2010'
@@ -34,6 +34,6 @@ INSERT INTO videos (
 INSERT INTO videos (
   slug, bucket_slug, name, author,announcement_id
 ) VALUES (
-  'keynote', 'opw2010', 'The Most Disgusting Word You''ll Hear'
-  'Mark Keating (mdk)', 4
+  'keynote', 'opw2010', 'The Most Disgusting Word You''ll Hear',
+  'Mark Keating (mdk)', 3
 );

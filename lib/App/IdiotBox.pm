@@ -16,7 +16,11 @@ use HTML::Zoom;
 
   sub slug { shift->{slug} }
   sub name { shift->{name} }
-  sub video_count { shift->{video_count} }
+  sub video_count {
+    exists $_[0]->{video_count}
+      ? $_[0]->{video_count}
+      : $_[0]->{videos}->count
+  }
   sub videos { shift->{videos} }
 
   package App::IdiotBox::Video;
