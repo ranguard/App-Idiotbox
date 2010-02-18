@@ -33,8 +33,22 @@ use HTML::Zoom;
 }
 
 default_config(
-  template_dir => $FindBin::Bin.'/../share/html'
+  template_dir => 'share/html',
+  store => 'SQLite',
+  db_file => 'var/lib/idiotbox.db',
 );
+
+sub BUILD {
+  my $self = shift;
+  my $store;
+  ($store = $self->config->{store}) =~ /^(\w+)$/
+    or die "Store config should be just a name, got ${store} instead";
+  my $store_class = "App::IdiotBox::Store::${store}";
+  eval "require ${store_class}; 1"
+    or die "Couldn't load ${store} store: $@";
+  $store_class->bind($self);
+}
+  
 
 dispatch {
   sub (/) { $self->show_front_page },
@@ -44,7 +58,7 @@ dispatch {
       sub (/) {
         $self->show_bucket($bucket)
       },
-      sub (/*) {
+      sub (/*/) {
         $self->show_video($bucket->videos->get({ slug => $_[1] }));
       }
     ]
@@ -52,6 +66,8 @@ dispatch {
 };
 
 method recent_announcements { $self->{recent_announcements} }
+
+method buckets { $self->{buckets} }
 
 method show_front_page {
   my $ann = $self->recent_announcements;

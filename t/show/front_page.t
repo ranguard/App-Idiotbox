@@ -5,8 +5,14 @@ use Test::More;
 use App::IdiotBox;
 use Data::Perl::Collection::Set;
 
+BEGIN { $INC{"App/IdiotBox/Store/Test.pm"} = __FILE__ }
+
+sub App::IdiotBox::Store::Test::bind {}
+
 my $idiotbox = App::IdiotBox->new({
- config => { template_dir => 'share/html' }
+  config => {
+    store => 'Test'
+  }
 });
 
 my $ann = do {

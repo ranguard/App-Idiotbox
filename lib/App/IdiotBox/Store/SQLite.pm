@@ -129,17 +129,15 @@ sub bind {
   bless({ idiotbox => $idiotbox }, $class)->_bind;
 }
 
-my $DSN = 'dbi:SQLite:idiotbox.db';
-
 sub _new_db_store {
-  DBIx::Data::Store->connect($DSN);
+  DBIx::Data::Store->connect("dbi:SQLite:$_[1]");
 }
 
 sub _bind {
   my $self = shift;
   my $idiotbox = $self->{idiotbox};
 
-  my $db_store = $self->_new_db_store;
+  my $db_store = $self->_new_db_store($idiotbox->config->{db_file});
 
   foreach my $to_bind (qw(recent_announcements buckets)) {
     $idiotbox->{$to_bind} = _bind_set($to_bind, { raw_store => $db_store });
