@@ -1,0 +1,10 @@
+#!/bin/sh
+
+flags=''
+
+for i in HTML-Zoom Web-Simple DBIx-Data-Store;
+do
+  flags="$flags -I$HOME/wdir/$i/lib"
+done
+
+perl $flags "$@"
