@@ -49,7 +49,6 @@ sub BUILD {
   $store_class->bind($self);
 }
   
-
 dispatch {
   sub (/) { $self->show_front_page },
   subdispatch sub (/*/...) {
@@ -72,76 +71,55 @@ method buckets { $self->{buckets} }
 method show_front_page {
   my $ann = $self->recent_announcements;
   $self->html_response(
-    front_page => [
-      '#announcement-list' => [
-        -repeat_content => {
-          repeat_for => $ann->map(sub { [
-            '.fill-bucket-name' => [
-              -replace_content => { replace_with => $_->bucket->name }
-            ],
-            '.fill-bucket-link' => [
-              -set_attribute => { name => 'href', value => $_->bucket->slug.'/' }
-            ],
-            '.fill-new-videos' => [
-              -replace_content => { replace_with => $_->video_count }
-            ],
-            '.fill-total-videos' => [
-              -replace_content => { replace_with => $_->bucket->video_count }
-            ],
-          ] })->as_stream
-        }
-      ]
-    ]
+    front_page => sub {
+      $_->select('#announcement-list')
+        ->repeat_content($ann->map(sub {
+            my $obj = $_;
+            sub {
+              $_->select('.bucket-name')->replace_content($obj->bucket->name)
+                ->select('.bucket-link')->set_attribute({
+                    name => 'href', value => $obj->bucket->slug.'/'
+                  })
+                ->select('.new-videos')->replace_content($obj->video_count)
+                ->select('.total-videos')->replace_content(
+                    $obj->bucket->video_count
+                  )
+            }
+          }))
+    }
   );
 }
 
 method show_bucket ($bucket) {
-  $self->html_response(bucket => [
-    '.fill-bucket-name' => [
-      -replace_content => { replace_with => $bucket->name }
-    ],
-    '#video-list' => [
-      -repeat_content => {
-        repeat_for => $bucket->videos->map(sub { [
-          '.fill-video-name' => [
-            -replace_content => { replace_with => $_->name }
-          ],
-          '.fill-video-author' => [
-            -replace_content => { replace_with => $_->author }
-          ],
-          '.fill-video-link' => [
-            -set_attribute => {
-              name => 'href', value => $_->slug.'/'
-            }
-          ],
-        ] })->as_stream
-      }
-    ]
-  ]);
+  $self->html_response(bucket => sub {
+    $_->select('.bucket-name')->replace_content($bucket->name)
+      ->select('#video-list')->repeat_content($bucket->videos->map(sub {
+          my $video = $_;
+          sub {
+            $_->select('.video-name')->replace_content($video->name)
+              ->select('.video-author')->replace_content($video->author)
+              ->select('.video-link')->set_attribute(
+                  { name => 'href', value => $video->slug.'/' }
+                )
+          }
+        }))
+  });
 }
 
 method show_video ($video) {
-  $self->html_response(video => [
-    '.fill-video-name' => [
-      -replace_content => { replace_with => $video->name }
-    ],
-    '.fill-author-name' => [
-      -replace_content => { replace_with => $video->author }
-    ],
-    '.fill-bucket-link' => [
-      -set_attribute => { name => 'href', value => '../' }
-    ],
-    '.fill-bucket-name' => [
-      -replace_content => { replace_with => $video->bucket->name }
-    ],
-    '.fill-video-details' => [
-      -replace_content => { replace_with => $video->details }
-    ]
-  ]);
+  $self->html_response(video => sub {
+    $_->select('.video-name')->replace_content($video->name)
+      ->select('.author-name')->replace_content($video->author)
+      ->select('.bucket-link')->set_attribute(
+          { name => 'href', value => '../' }
+        )
+      ->select('.bucket-name')->replace_content($video->bucket->name)
+      ->select('.video-details')->replace_content($video->details)
+  });
 }
 
 method html_response ($template_name, $selectors) {
-  my $io = $self->_zoom_for($template_name => $selectors)->as_readable_fh;
+  my $io = $self->_zoom_for($template_name => $selectors)->to_fh;
   return [ 200, [ 'Content-Type' => 'text/html' ], $io ]
 }
 
@@ -161,18 +139,12 @@ method _zoom_for ($template_name, $selectors) {
     HTML::Zoom->from_file(
                   $self->_template_filename_for($template_name)
                 )
-              ->with_selectors(
-                  '#main-content' => [
-                    -capture_events => { into => \@body }
-                  ]
-                )
+              ->select('#main-content')->collect_content({ into => \@body })
               ->run;
-    $self->_layout_zoom->with_selectors(
-      '#main-content' => [
-        -replace_content_events => { replace_with => \@body }
-      ]
-    )->to_zoom;
-  })->with_selectors($selectors)
+    $self->_layout_zoom
+         ->select('#main-content')->replace_content(\@body)
+         ->memoize;
+  })->apply($selectors);
 }
 
 1;
