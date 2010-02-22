@@ -4,6 +4,7 @@ use Web::Simple __PACKAGE__;
 use Method::Signatures::Simple;
 use FindBin;
 use HTML::Zoom;
+use HTML::Zoom::FilterBuilder::Template;
 
 {
   package App::IdiotBox::Announcement;
@@ -30,12 +31,17 @@ use HTML::Zoom;
   sub author { shift->{author} }
   sub details { shift->{details} }
   sub bucket { shift->{bucket} }
+  sub file_name {
+    (my $s = join(' ', @{+shift}{qw(author name)})) =~ s/ /-/g;
+    $s;
+  }
 }
 
 default_config(
   template_dir => 'share/html',
   store => 'SQLite',
   db_file => 'var/lib/idiotbox.db',
+  base_url => 'http://localhost:3000/',
 );
 
 sub BUILD {
@@ -108,6 +114,10 @@ method show_bucket ($bucket) {
 
 method show_video ($video) {
   $self->html_response(video => sub {
+    my $video_url = 
+      $self->base_url
+      .join('/', $video->bucket->slug, $video->slug, $video->file_name.'.flv');
+
     $_->select('.video-name')->replace_content($video->name)
       ->select('.author-name')->replace_content($video->author)
       ->select('.bucket-link')->set_attribute(
@@ -115,6 +125,7 @@ method show_video ($video) {
         )
       ->select('.bucket-name')->replace_content($video->bucket->name)
       ->select('.video-details')->replace_content($video->details)
+      ->select('script')->template_text_raw({ video_url => $video_url });
   });
 }
 
@@ -145,6 +156,13 @@ method _zoom_for ($template_name, $selectors) {
          ->select('#main-content')->replace_content(\@body)
          ->memoize;
   })->apply($selectors);
+}
+
+method base_url {
+  $self->{base_url} ||= do {
+    (my $u = $self->config->{base_url}) =~ s/\/$//;
+    "${u}/";
+  }
 }
 
 1;
