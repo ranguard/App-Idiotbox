@@ -21,7 +21,6 @@ my (%BIND, %SQL);
       deflate => sub {
         my ($self, $obj) = @_;
         my %raw = %$obj;
-        delete $raw{bucket};
         \%raw;
       }
     },
@@ -36,7 +35,7 @@ my (%BIND, %SQL);
         $obj->{videos} = _bind_set('bucket_videos',
           {
             raw_store => $self->_store->raw_store,
-            implicit_arguments => { bucket_slug => $obj->{slug} },
+            implicit_arguments => { 'bucket.slug' => $obj->{slug} },
           },
           {
             class => {
@@ -97,6 +96,22 @@ my (%BIND, %SQL);
       ORDER BY
         announcement.made_at DESC
     },
+    insert_command_constructor => sub {
+      require DBIx::Data::Store::Command::Insert::LastInsertId;
+      my $self = shift;
+      DBIx::Data::Store::Command::Insert::LastInsertId->new(
+        id_column => 'id',
+        raw_store => $self->raw_store,
+        insert_call_command => $self->raw_store->new_call_command(@_)
+      );
+    },
+    insert_sql => q{
+      INSERT INTO announcements
+        (bucket_slug, made_at)
+      VALUES
+        (?, ?)
+    },
+    insert_argument_order => [ qw(bucket.slug made_at) ],
   },
   buckets => {
     select_column_order => [ qw(slug name) ],
@@ -104,6 +119,10 @@ my (%BIND, %SQL);
       SELECT slug, name
       FROM buckets
       WHERE slug = ?
+    },
+    select_sql => q{
+      SELECT slug, name
+      FROM buckets
     },
     select_single_argument_order => [ 'slug' ],
   },
@@ -113,14 +132,24 @@ my (%BIND, %SQL);
       SELECT slug, name, author, details
       FROM videos
       WHERE bucket_slug = ?
+      ORDER BY name
     },
-    select_argument_order => [ 'bucket_slug' ],
+    select_argument_order => [ 'bucket.slug' ],
     select_single_sql => q{
       SELECT slug, name, author, details
       FROM videos
       WHERE bucket_slug = ? AND slug = ?
     },
-    select_single_argument_order => [ qw(bucket_slug slug) ],
+    select_single_argument_order => [ qw(bucket.slug slug) ],
+    insert_sql => q{
+      INSERT INTO videos
+        (announcement_id, bucket_slug, slug, name, author, details)
+      VALUES
+        (?, ?, ?, ?, ?, '')
+    },
+    insert_argument_order => [
+      qw(announcement.id bucket.slug slug name author)
+    ],
   },
 );
 

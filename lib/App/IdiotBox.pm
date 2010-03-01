@@ -9,6 +9,7 @@ use HTML::Zoom::FilterBuilder::Template;
 {
   package App::IdiotBox::Announcement;
 
+  sub id { shift->{id} }
   sub made_at { shift->{made_at} } 
   sub bucket { shift->{bucket} } 
   sub video_count { shift->{video_count} } 
@@ -35,6 +36,9 @@ use HTML::Zoom::FilterBuilder::Template;
     (my $s = join(' ', @{+shift}{qw(author name)})) =~ s/ /-/g;
     $s;
   }
+  sub url_path {
+    join('/', $_[0]->bucket->slug, $_[0]->slug);
+  }
 }
 
 default_config(
@@ -42,6 +46,7 @@ default_config(
   store => 'SQLite',
   db_file => 'var/lib/idiotbox.db',
   base_url => 'http://localhost:3000/',
+  base_dir => do { use FindBin; $FindBin::Bin },
 );
 
 sub BUILD {
@@ -163,6 +168,27 @@ method base_url {
     (my $u = $self->config->{base_url}) =~ s/\/$//;
     "${u}/";
   }
+}
+
+method _run_cli {
+  unless (@ARGV == 1 && $ARGV[0] eq 'import') {
+    return $self->SUPER::_run_cli(@_);
+  }
+  $self->cli_import;
+}
+
+method _cli_usage {
+  "To import data into your idiotbox install, chdir into a directory\n".
+  "containing video files and run:\n".
+  "\n".
+  "  $0 import\n".
+  "\n".
+  $self->SUPER::_cli_usage(@_);
+}
+
+method cli_import {
+  require App::IdiotBox::Importer;
+  App::IdiotBox::Importer->run($self);
 }
 
 1;

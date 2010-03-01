@@ -22,9 +22,32 @@ sub _inflate {
 
 sub _deflate {
   my ($self, $obj) = @_;
-  $self->_class->{deflate}->($self, $obj)
+  my $fat_raw = $self->_class->{deflate}->($self, $obj);
+  $self->_splat($fat_raw)
 }
 
-sub _merge { die "no" }
+sub _splat {
+  my ($self, $fat) = @_;
+  my %raw;
+  foreach my $key (keys %$fat) {
+    my $v = $fat->{$key};
+    $v = { %$v } if blessed($v);
+    if (ref($v) eq 'HASH') {
+      #my $splat = $self->_splat($v);
+      my $splat = $v;
+      @raw{map "${key}.$_", keys %$splat} = values %$splat;
+    } else {
+      $raw{$key} = $v;
+    }
+  }
+  \%raw
+}
+
+sub _merge {
+  my ($self, $new, $to_merge) = @_;
+#require Carp; warn Carp::longmess; warn $new; warn $to_merge;
+  @{$new}{keys %$to_merge} = values %$to_merge;
+  return
+}
 
 1;
