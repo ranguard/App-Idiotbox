@@ -1,0 +1,91 @@
+
+
+body {
+  font-family: helvetica, verdana, sans-serif;
+  font-size: 10pt;
+  background: #cadae2;
+}
+
+
+p {
+  line-height: 150%;
+}
+
+
+p.footer {
+  font-size: 90%;
+  color: #999999;
+  text-align: right;
+  margin: 20px 0 10px 0; 
+}
+
+
+h1 {
+  font-size: 200%;
+  color: #666666;
+  display: block;
+  padding: 20px 0 5px 0px;
+  margin: 0px 0px 5px 0;
+}
+
+h1.notseen {
+  text-indent: -10em;
+}
+
+h1.video-name {
+  font-size: 200%;
+  color: #666666;
+  width: 270px;
+  display: block;
+  padding: 5px 0 5px 4px;
+  margin-bottom: 5px;
+}
+
+
+h2.author-name {
+  font-size: 150%;
+  color: #666666;
+  width: 270px;
+  display: block;
+  padding: 5px 0 5px 4px;
+  margin-bottom: 5px;
+}
+
+h3.bucket-name {
+  font-size: 125%;
+  color: #666666;
+  width: 270px;
+  display: block;
+  padding: 5px 0 5px 4px;
+  margin-bottom: 5px;
+  border-bottom: 1px #0000ff dashed;
+}
+
+
+
+
+
+
+
+
+#navbar ul {
+  margin-top: 85px;
+  margin-left: -30px;
+}
+
+#navbar li {
+  float: left;
+  font-size: 100%;
+  padding: 0 4px 0 4px;
+  list-style-type: none;
+}
+
+#navbar a {
+  text-decoration: none;
+  color: #888888;
+}
+
+#navbar a:hover {
+  text-decoration: none;
+  color: #336699;
+}
