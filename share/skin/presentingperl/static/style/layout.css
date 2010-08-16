@@ -1,78 +1,64 @@
- 
-#wrap1 {   
-  position: absolute;
-  top: 02px;
-  left: 10px;
-  width: 960px;
-  background: #ffffff;
-  border-top: 2px solid #333333;
-  border-left: 2px solid #333333;
-  border-right: 2px solid #333333;
-  border-bottom: 8px solid #333333;
-}   
-
-#wrap2 {
-  width: 956px;
-  position: relative;
-  background: #ffffff;
-  margin-top: 105px;
+body {
+	background-image:url('/styles/images/background-blue.png');
+	background-repeat:no-repeat;
+	background-color:#00b2e7;
+	color:#fff;
 }
 
-#navbar {
-  top: 10px;
-  left: 310px;
-  width: 660px;
-  position: absolute;
-  background: #ffffff;
-  height: 100px;
+h1 {
+	display:none;
 }
 
-#logo {
-  top: 10px;
-  left: 18px;
-  width: 300px;
-  position: absolute;
-  background: #ffffff url(images/logo.jpg) no-repeat;
-  height: 100px;
+h2 {
+	font:18pt Helvetica, Arial, sans-serif;
 }
 
-#left-column {
-  width: 644px;
-  background: #efefef;
-  float: left;
-  min-height: 300px;
-  padding: 4px;
-  margin-left: 2px;
-  margin-top: 20px;
+p {
+	font:11pt Helvetica, Arial, sans-serif;
+	color:#eee;
 }
 
-#right-column {
-  width: 282px;
-  background: white;
-  float: right;
-  min-height: 300px;
-  margin-left: 10px;
-  margin-bottom: 40px;
-  margin-top: 15px;
-  padding: 4px;
-
+#main-content {
+	width:900px;
+	margin:5em auto 0 auto;
 }
 
-#custom-html {
-  width: 922px;
-  background: #ffffff;
-  clear: both;
-  min-height: 300px;
-  padding: 15px;
-
+#footer
+{
+	width:900px;
+	margin:0 auto;
+	border-top:1px solid #ccc;
 }
 
-#footer {
-  width: 952px;
-  background: #efefef;
-  margin-top: 10px;
-  padding: 4px;
-  border-top: 1px dashed #336699;
+p.footer{
+	font-size:8pt;
+	color:#eee;
+	margin-top:3pt;
+	text-align:right;
 }
 
+p.footer a
+{
+	text-decoration:none;
+	color:#fff;
+}
+
+p.footer a:hover
+{
+	text-decoration:underline;
+}
+
+.powered_by
+{
+	float:left;margin-top:8pt;padding-right:1em;
+}
+
+.powered_by h2
+{
+	display:inline;
+	font-size:10pt;
+	background-image:url('http://external.shadowcatprojects.net/data/common/images/idiot-box.png');
+	background-repeat:no-repeat;
+	padding:6px 0 8px 30px;
+}
 
